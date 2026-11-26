@@ -106,9 +106,8 @@ class BaseEncoder(nn.Module):
         # convert robot_id to one-hot
         robot_id = obs_norm["robot_id"].view(-1).long()
         robot_id_one_hot = F.one_hot(robot_id, num_classes=NUM_ROBOTS).float()
-        gripper_open = (
-            torch.abs(obs_norm[k["gripper"]][:, 0] - obs_norm[k["gripper"]][:, 1]) - 1.0
-        )
+        # left finger only: both measured finger positions are equal (robosuite's Panda: equal in magnitude, but the two fingers have opposite signs in its state)
+        gripper_open = obs_norm[k["gripper"]][:, 0]
 
         composer_in = {
             "eef_pos": obs_norm[k["eef_pos"]],

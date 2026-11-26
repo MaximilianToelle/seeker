@@ -127,12 +127,8 @@ class ObsInputProcessor(nn.Module):
         composer_robot_id_one_hot = F.one_hot(
             composer_robot_id, num_classes=NUM_ROBOTS
         ).float()
-        gripper_open = (
-            torch.abs(
-                composer_norm[k["gripper"]][:, 0] - composer_norm[k["gripper"]][:, 1]
-            )
-            - 1.0
-        )
+        # left finger only: both measured finger positions are equal (robosuite's Panda: equal in magnitude, but the two fingers have opposite signs in its state)
+        gripper_open = composer_norm[k["gripper"]][:, 0]
 
         composer_in = {
             "eef_pos": composer_norm[k["eef_pos"]],
