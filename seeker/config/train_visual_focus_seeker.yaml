@@ -38,6 +38,8 @@ dataset_demo_count_mode: per_task
 shape_meta: ${task.shape_meta}
 exp_name: "view-${visual_mode}_action-${action_rep}_demos-${n_demo}_iters-${seeker_num_iters}_noprop-${seeker_disable_proprio}_nogate-${seeker_disable_head_gating}_seed-${seed}"
 n_demo: 100
+# null: the first n_demo episodes per task; a seed: n_demo random ones, as DP3's train_episode_mask picks them
+demo_selection_seed: null
 horizon: 16
 n_obs_steps: 1
 n_action_steps: 8

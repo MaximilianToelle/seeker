@@ -43,6 +43,7 @@ dataset:
   _target_: ${dataset}
   n_demo: ${n_demo}
   demo_count_mode: ${dataset_demo_count_mode}
+  demo_selection_seed: ${demo_selection_seed}
   shape_meta: *shape_meta
   dataset_path: ${dataset_path}
   horizon: ${horizon}

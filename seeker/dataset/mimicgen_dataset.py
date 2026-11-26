@@ -53,7 +53,9 @@ class MimicGenDataset(torch.utils.data.Dataset):
         cache_dir=None,
         include_oracle_info=False,
         mirror_augmentation=None,
+        demo_selection_seed=None,
     ):
+        self.demo_selection_seed = demo_selection_seed
         self.n_obs_steps = int(n_obs_steps)
         if self.n_obs_steps < 1:
             raise ValueError("n_obs_steps must be >= 1")
@@ -114,13 +116,13 @@ class MimicGenDataset(torch.utils.data.Dataset):
                         "n_demo exceeds demos available for one task group: "
                         f"requested {n}, got {len(group)}"
                     )
-                selected_episode_indices.extend(group[:n].tolist())
+                selected_episode_indices.extend(self._select_demos(group, n).tolist())
             selected_episode_indices = np.asarray(selected_episode_indices, dtype=np.int64)
         else:
             n = int(n_demo)
             if n < 1 or n > self.n_demo_all:
                 raise ValueError(f"n_demo must be in [1, {self.n_demo_all}], got {n}")
-            selected_episode_indices = np.arange(n, dtype=np.int64)
+            selected_episode_indices = self._select_demos(np.arange(self.n_demo_all, dtype=np.int64), n)
 
         self.episode_indices_active = np.asarray(selected_episode_indices, dtype=np.int64)
         self.n_demo_active = int(len(self.episode_indices_active))
@@ -537,6 +539,14 @@ class MimicGenDataset(torch.utils.data.Dataset):
             load_numpy_array(self.cache_dir, os.path.join("lowdim", "robot_id.npy"))
         ).reshape(-1).astype(np.int64, copy=False)
         self.task_instructions_all = load_task_instructions(self.cache_dir)
+
+    def _select_demos(self, episode_indices, n):
+        """The first n episodes; with demo_selection_seed, n random ones by the rule of DP3's
+        train_episode_mask, so both train on the same episodes for the same seed."""
+        if self.demo_selection_seed is None:
+            return episode_indices[:n]
+        rng = np.random.default_rng(seed=self.demo_selection_seed)
+        return np.sort(episode_indices[rng.choice(len(episode_indices), size=n, replace=False)])
 
     def _get_task_episode_groups(self):
         """Return contiguous episode groups that define one task each."""
