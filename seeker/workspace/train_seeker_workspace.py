@@ -253,7 +253,9 @@ class TrainSeekerWorkspace(BaseWorkspace):
                 step_log["train_loss"] = train_loss
 
                 # checkpoint
-                if (self.epoch % cfg.training.checkpoint_every) == 0:
+                # num_epochs can be fractional (e.g. 30000 / n_demo); the loop then still runs the last, partial epoch in full
+                is_last_epoch = self.epoch + 1 >= cfg.training.num_epochs
+                if (self.epoch % cfg.training.checkpoint_every) == 0 or is_last_epoch:
                     # checkpointing
                     if cfg.checkpoint.save_last_ckpt:
                         self.save_checkpoint()
