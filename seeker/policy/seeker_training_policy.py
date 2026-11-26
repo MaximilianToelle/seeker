@@ -12,7 +12,7 @@ from seeker.model.diffusion.conditional_unet1d import ConditionalUnet1D
 from seeker.model.diffusion.mask_generator import LowdimMaskGenerator
 from seeker.model.seeker_training_encoder import SeekerTrainingEncoder
 from seeker.policy.base_image_policy import BaseImagePolicy
-from seeker.util.robomimic_env import validate_action_rep
+from seeker.dataset.action import validate_action_rep
 
 
 class SeekerTrainingPolicy(BaseImagePolicy):
